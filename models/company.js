@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForFilteringAll } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -54,16 +54,35 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(queryObj) {
+    const filterObj = sqlForFilteringAll(queryObj);
+    
+    if(!filterObj) {
+      const companiesRes = await db.query(
+          `SELECT handle,
+                  name,
+                  description,
+                  num_employees AS "numEmployees",
+                  logo_url AS "logoUrl"
+            FROM companies
+            ORDER BY name`);
+      return companiesRes.rows;
+    }
+    
+    const { setFilters, values} = filterObj;
+    
     const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-           FROM companies
-           ORDER BY name`);
-    return companiesRes.rows;
+      `SELECT handle,
+              name,
+              description,
+              num_employees AS "numEmployees",
+              logo_url AS "logoUrl"
+        FROM companies
+        WHERE ${setFilters}
+        ORDER BY name`,
+        [...values]);
+  return companiesRes.rows;
+    
   }
 
   /** Given a company handle, return data about company.
