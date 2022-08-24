@@ -1,3 +1,4 @@
+"use strict";
 const { BadRequestError } = require("../expressError");
 
 // THIS NEEDS SOME GREAT DOCUMENTATION.
@@ -6,15 +7,16 @@ const { BadRequestError } = require("../expressError");
  * Accepts an Object (dataToUpdate) which can partially update rows in db,
  *  and an Object jsToSQL which maps javascript keys to psql columns.
  *
- * Data to update = {name, description, numEmployees, logoUrl}
+ * e.g. Accepts:
+ * dataToUpdate = {name: "Phil", isCool: "yes!"}
  *
- * jsToSql = { keyforupdate: value});
+ * jsToSql = { isCool: "is_cool" }
  *
  * Example return:
  *
  *  {
- *  setCols: '"first_name"=$1', '"age"=$2'
- *  values:[`dataToUpdate_values`]
+ *  setCols: '"name"=$1, "is_cool"=$2'
+ *  values:["Phil", "yes!"]
  * }
  *
 */
