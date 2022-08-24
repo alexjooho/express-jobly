@@ -53,6 +53,7 @@ describe("create", function () {
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
+
   });
 });
 
@@ -60,7 +61,8 @@ describe("create", function () {
 
 describe("findAll", function () {
   test("works: no filter", async function () {
-    let companies = await Company.findAll();
+    const queryObj = {};
+    let companies = await Company.findAll(queryObj);
     expect(companies).toEqual([
       {
         handle: "c1",
@@ -84,6 +86,46 @@ describe("findAll", function () {
         logoUrl: "http://c3.img",
       },
     ]);
+  });
+
+  test("works: with filter", async function () {
+
+    const queryObj = {"maxEmployees": 2, "nameLike": '2'};
+    let companies = await Company.findAll(queryObj);
+
+    expect(companies).toEqual([
+
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+
+    ]);
+  });
+
+  test("fails: with wrong filter", async function () {
+
+    const queryObj = {"color": 2, "nameLike": '2'};
+
+    try {
+      await Company.findAll(queryObj);
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+  test("fails: with minEmployees > maxEmployees", async function () {
+
+    const queryObj = {"minEmployees": 2, "maxEmployees": '1'};
+
+    try {
+      await Company.findAll(queryObj);
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
   });
 });
 

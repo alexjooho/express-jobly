@@ -96,6 +96,30 @@ describe("GET /companies", function () {
     });
   });
 
+  test("works: with filter", async function () {
+    const resp = await request(app).get("/companies/?maxEmployees=2&nameLike=2")
+    expect(resp.body).toEqual({
+      companies:
+          [
+            {
+              handle: "c2",
+              name: "C2",
+              description: "Desc2",
+              numEmployees: 2,
+              logoUrl: "http://c2.img",
+            },
+          ],
+    });
+  })
+
+  test("fails: with wrong filter", async function () {
+    const resp = await request(app).get("/companies/?color=2")
+    expect(resp.status).toEqual(400);
+
+  });
+
+
+
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This
@@ -227,3 +251,4 @@ describe("DELETE /companies/:handle", function () {
     expect(resp.statusCode).toEqual(404);
   });
 });
+
