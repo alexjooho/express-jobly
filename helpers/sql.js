@@ -48,48 +48,50 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  *  values: [50]
  * }
  */
-function sqlForFilteringAll(queryObj) {
-  const filterOptions = new Set(["minEmployees", "maxEmployees", "nameLike"]);
 
-  const keys = Object.keys(queryObj)
-  if (keys.length === 0) {
-    return ""
-  }
+// put this in class because it's only used once and in one place
+// function sqlForFilteringAll(queryObj) {
+//   const filterOptions = new Set(["minEmployees", "maxEmployees", "nameLike"]);
 
-  for(let key of keys) {
-    if(!filterOptions.has(key)) {
-      throw new BadRequestError(`${key} not a valid filter option!`)
-    }
-  }
+//   const keys = Object.keys(queryObj)
+//   if (keys.length === 0) {
+//     return ""
+//   }
 
-  if("minEmployees" in queryObj && "maxEmployees" in queryObj) {
-    if(queryObj["minEmployees"] > queryObj["maxEmployees"]) {
-      throw new BadRequestError("minEmployees can not be greater than maxEmployees");
-    }
-  }
+//   for(let key of keys) {
+//     if(!filterOptions.has(key)) {
+//       throw new BadRequestError(`${key} not a valid filter option!`)
+//     }
+//   }
+
+//   if("minEmployees" in queryObj && "maxEmployees" in queryObj) {
+//     if(queryObj["minEmployees"] > queryObj["maxEmployees"]) {
+//       throw new BadRequestError("minEmployees can not be greater than maxEmployees");
+//     }
+//   }
 
 
-  const filters = keys.map((filter, idx) => {
-    if(filter === "minEmployees") {
-      return `"num_employees">=$${idx + 1}`
-    }
-    else if(filter === "maxEmployees") {
-      return `"num_employees"<=$${idx + 1}`
-    }
-    else if(filter === "nameLike") {
-      let value = queryObj["nameLike"];
-      let updatedValue = `%${value}%`;
-      queryObj["nameLike"] = updatedValue;
+//   const filters = keys.map((filter, idx) => {
+//     if(filter === "minEmployees") {
+//       return `"num_employees">=$${idx + 1}`
+//     }
+//     else if(filter === "maxEmployees") {
+//       return `"num_employees"<=$${idx + 1}`
+//     }
+//     else if(filter === "nameLike") {
+//       let value = queryObj["nameLike"];
+//       let updatedValue = `%${value}%`;
+//       queryObj["nameLike"] = updatedValue;
 
-      return `"name" ILIKE $${idx + 1}`
-    }
-  })
+//       return `"name" ILIKE $${idx + 1}`
+//     }
+//   })
 
-  return {
-    setFilters: filters.join(" AND "),
-    values: Object.values(queryObj),
-  };
+//   return {
+//     setFilters: filters.join(" AND "),
+//     values: Object.values(queryObj),
+//   };
 
-}
+// }
 
-module.exports = { sqlForPartialUpdate, sqlForFilteringAll };
+module.exports = { sqlForPartialUpdate };

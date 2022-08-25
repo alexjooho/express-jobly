@@ -57,6 +57,37 @@ describe("create", function () {
   });
 });
 
+describe("_sqlForFilteringAll", function () {
+      test("works", function() {
+
+        const searchObj = {"minEmployees": 12, "maxEmployees": 32, "name": 'Alex'};
+
+        const results = Company._sqlForFilteringAll(searchObj);
+
+        const expected = {
+            whereBuilder:
+            'WHERE name ILIKE $1 AND num_employees>=$2 AND num_employees<=$3',
+
+            values: ['%Alex%', 12, 32],
+        }
+
+        expect(results).toEqual(expected);
+    })
+
+    test("works with empty data object", function() {
+
+        const results = Company._sqlForFilteringAll({});
+        
+        const expected = {
+          whereBuilder: "",
+          values: [],
+        }
+
+        expect(results).toEqual(expected);
+    })
+
+})
+
 /************************************** findAll */
 
 describe("findAll", function () {
@@ -90,7 +121,7 @@ describe("findAll", function () {
 
   test("works: with filter", async function () {
 
-    const queryObj = {"maxEmployees": 2, "nameLike": '2'};
+    const queryObj = {"maxEmployees": 2, "name": '2'};
     let companies = await Company.findAll(queryObj);
 
     expect(companies).toEqual([
@@ -108,7 +139,7 @@ describe("findAll", function () {
 
   test("fails: with wrong filter", async function () {
 
-    const queryObj = {"color": 2, "nameLike": '2'};
+    const queryObj = {"color": 2, "name": '2'};
 
     try {
       await Company.findAll(queryObj);

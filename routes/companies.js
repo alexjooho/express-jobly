@@ -11,6 +11,7 @@ const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
+const companyFilterSchema = require("../schemas/companyFilter.json")
 
 const router = new express.Router();
 
@@ -51,8 +52,24 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  const queries = req.query;
-  const companies = await Company.findAll(queries);
+  // can do a json schema for queries (this way you will get a 400 error with bad queries)
+  let q = req.query
+  
+  // req.query can not be altered or changed!!! so we set another variable that we use to change and
+  // put into jsonschema for validation
+  
+  // TODO: question: are q and req.query not the same reference point? How come q can change but req.query can't
+  
+  if(q.minEmployees) q.minEmployees = Number(q.minEmployees);
+  if(q.maxEmployees) q.maxEmployees = Number(q.maxEmployees);
+  
+  const result = jsonschema.validate(q, companyFilterSchema, {required: true});
+  if(!result.valid) {
+    const errs = result.errors.map(err => err.stack);
+    throw new BadRequestError(errs);
+  }
+  
+  const companies = await Company.findAll(req.query);
   return res.json({ companies });
 });
 

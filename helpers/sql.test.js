@@ -23,11 +23,10 @@ const { sqlForPartialUpdate, sqlForFilteringAll} = require("./sql")
     //   });
     // });
 
-const dataToUpdate = { name: "Phil", description: "coder", isCool: "yes!" }
-const jsToSql = {isCool: "is_cool"}
-
-
 describe("test sqlForPartialUpdate function", function() {
+    const dataToUpdate = { name: "Phil", description: "coder", isCool: "yes!" }
+    const jsToSql = {isCool: "is_cool"}
+    
     test("works", function() {
         const results = sqlForPartialUpdate(dataToUpdate, jsToSql);
 
@@ -50,51 +49,48 @@ describe("test sqlForPartialUpdate function", function() {
 })
 
 
+// describe("test sqlForFilteringAll function", function() {
+//     test("works", function() {
 
+//         const searchObj = {"minEmployees": 12, "maxEmployees": 32, "nameLike": 'Alex'};
 
+//         const results = sqlForFilteringAll(searchObj);
 
-describe("test sqlForFilteringAll function", function() {
-    test("works", function() {
+//         const expected = {
+//             setFilters:
+//             '"num_employees">=$1 AND "num_employees"<=$2 AND "name" ILIKE $3',
 
-        const searchObj = {"minEmployees": 12, "maxEmployees": 32, "nameLike": 'Alex'};
+//             values: Object.values(searchObj),
+//         }
 
-        const results = sqlForFilteringAll(searchObj);
+//         expect(results).toEqual(expected);
+//     })
 
-        const expected = {
-            setFilters:
-            '"num_employees">=$1 AND "num_employees"<=$2 AND "name" ILIKE $3',
+//     test("fails: minEmployees > maxEmployees", function() {
+//         function fail() {
+//             const searchObj = {"minEmployees": 42, "maxEmployees": 32, "nameLike": 'Alex'};
+//             sqlForFilteringAll(searchObj);
+//         }
 
-            values: Object.values(searchObj),
-        }
+//         expect(fail).toThrow(new BadRequestError(
+//             "minEmployees can not be greater than maxEmployees")); // or could do .toThrowError
+//         // could also just input BadRequestError if you don't care about message
 
-        expect(results).toEqual(expected);
-    })
+//             // Could also do this way:
+//             //
+//             //try: (
+//             // yourfunctionThatMayThrowAnError();
+//             // } catch (err) {
+//             // expect(err instanceof TheSpecificError).toBeTruthy();
+//             // }
 
-    test("fails: minEmployees > maxEmployees", function() {
-        function fail() {
-            const searchObj = {"minEmployees": 42, "maxEmployees": 32, "nameLike": 'Alex'};
-            sqlForFilteringAll(searchObj);
-        }
+//     })
 
-        expect(fail).toThrow(new BadRequestError(
-            "minEmployees can not be greater than maxEmployees")); // or could do .toThrowError
-        // could also just input BadRequestError if you don't care about message
+//     test("works with no data", function() {
 
-            // Could also do this way:
-            //
-            //try: (
-            // yourfunctionThatMayThrowAnError();
-            // } catch (err) {
-            // expect(err instanceof TheSpecificError).toBeTruthy();
-            // }
+//         const results = sqlForFilteringAll({});
 
-    })
+//         expect(results).toEqual("");
+//     })
 
-    test("works with no data", function() {
-
-        const results = sqlForFilteringAll({});
-
-        expect(results).toEqual("");
-    })
-
-})
+// })
