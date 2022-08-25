@@ -6,6 +6,7 @@ const {
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin,
+  ensureAdminOrSame,
 } = require("./auth");
 
 
@@ -101,3 +102,48 @@ describe("ensureAdmin", function () {
   });
 });
 
+  describe("ensureAdminOrSame", function () {
+    test("works: when performed by admin", function () {
+      // TODO: in code review make sure that our understanding of this is accurate
+      expect.assertions(1);
+      const req = {params:{username: "non-admin"}};
+      const res = { locals: { user: { username:"testAdm", isAdmin: true } } };
+      const next = function (err) {
+        expect(err).toBeFalsy();
+      };
+      ensureAdminOrSame(req, res, next);
+    });
+
+    test("works: when performed by non-admin", function () {
+      expect.assertions(1);
+      const req = {params: {username: "Same-User"}};
+      const res = { locals: { user: {username: "Same-User", isAdmin: false } } };
+
+      const next = function (err) {
+        expect(err).toBeFalsy();
+      };
+      ensureAdminOrSame(req, res, next);
+    });
+
+    test("fails: when performed by different non-admin user", function () {
+      expect.assertions(1);
+      const req = {params: {username: "user-2"}};
+      const res = { locals: { user: { username: "user-1",isAdmin: false } } };
+
+      const next = function (err) {
+        expect(err instanceof UnauthorizedError).toBeTruthy();
+      };
+      ensureAdminOrSame(req, res, next);
+    });
+
+    test("fails: when no active user", function () {
+      expect.assertions(1);
+      const req = {params:{username: ""}};
+      const res = { locals:{}};
+
+      const next = function (err) {
+        expect(err instanceof UnauthorizedError).toBeTruthy();
+      };
+      ensureAdminOrSame(req, res, next);
+    });
+})
