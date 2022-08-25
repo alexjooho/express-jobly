@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
@@ -25,7 +25,7 @@ const router = new express.Router();
  * Authorization required: login
  */
 
-router.post("/", ensureLoggedIn, async function (req, res, next) {
+router.post("/", ensureAdmin,  async function (req, res, next) {
   const validator = jsonschema.validate(
     req.body,
     companyNewSchema,
@@ -53,22 +53,22 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   // can do a json schema for queries (this way you will get a 400 error with bad queries)
-  let q = req.query
-  
+  let query = req.query
+
   // req.query can not be altered or changed!!! so we set another variable that we use to change and
   // put into jsonschema for validation
-  
+
   // TODO: question: are q and req.query not the same reference point? How come q can change but req.query can't
-  
-  if(q.minEmployees) q.minEmployees = Number(q.minEmployees);
-  if(q.maxEmployees) q.maxEmployees = Number(q.maxEmployees);
-  
+
+  if(query.minEmployees) query.minEmployees = Number(query.minEmployees);
+  if(query.maxEmployees) query.maxEmployees = Number(query.maxEmployees);
+
   const result = jsonschema.validate(q, companyFilterSchema, {required: true});
   if(!result.valid) {
     const errs = result.errors.map(err => err.stack);
     throw new BadRequestError(errs);
   }
-  
+
   const companies = await Company.findAll(req.query);
   return res.json({ companies });
 });
@@ -97,7 +97,7 @@ router.get("/:handle", async function (req, res, next) {
  * Authorization required: login
  */
 
-router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
+router.patch("/:handle", ensureAdmin, async function (req, res, next) {
   const validator = jsonschema.validate(
     req.body,
     companyUpdateSchema,
@@ -117,7 +117,7 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
  * Authorization: login
  */
 
-router.delete("/:handle", ensureLoggedIn, async function (req, res, next) {
+router.delete("/:handle", ensureAdmin, async function (req, res, next) {
   await Company.remove(req.params.handle);
   return res.json({ deleted: req.params.handle });
 });
