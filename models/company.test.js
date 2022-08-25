@@ -77,7 +77,7 @@ describe("_sqlForFilteringAll", function () {
     test("works with empty data object", function() {
 
         const results = Company._sqlForFilteringAll({});
-        
+
         const expected = {
           whereBuilder: "",
           values: [],

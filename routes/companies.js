@@ -63,7 +63,7 @@ router.get("/", async function (req, res, next) {
   if(query.minEmployees) query.minEmployees = Number(query.minEmployees);
   if(query.maxEmployees) query.maxEmployees = Number(query.maxEmployees);
 
-  const result = jsonschema.validate(q, companyFilterSchema, {required: true});
+  const result = jsonschema.validate(query, companyFilterSchema, {required: true});
   if(!result.valid) {
     const errs = result.errors.map(err => err.stack);
     throw new BadRequestError(errs);
