@@ -3,11 +3,15 @@ const bcrypt = require("bcrypt");
 const db = require("../db.js");
 const { BCRYPT_WORK_FACTOR } = require("../config");
 
+let jobIds = [];
+
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM companies");
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
+  
+  await db.query("DELETE FROM jobs");
 
   await db.query(`
     INSERT INTO companies(handle, name, num_employees, description, logo_url)
@@ -28,6 +32,20 @@ async function commonBeforeAll() {
         await bcrypt.hash("password1", BCRYPT_WORK_FACTOR),
         await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
       ]);
+      
+  let results = await db.query(`
+        INSERT INTO jobs(title,
+                          salary,
+                          equity,
+                          company_handle)
+        VALUES ('j1', 30, 0.3, 'c1'),
+                ('j2', 50, 0, 'c2')
+        RETURNING id`);
+        
+  jobIds.push(...results.rows.map(x => x.id));
+  // need to push/mutate the array instead of setting a new array because when you
+  // export it, you are exporting the reference! (if you set it to a new array, you would
+  // lose the reference to the exact same variable in the test file)
 }
 
 async function commonBeforeEach() {
@@ -48,4 +66,5 @@ module.exports = {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  jobIds,
 };

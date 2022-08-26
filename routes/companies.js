@@ -54,11 +54,11 @@ router.post("/", ensureAdmin,  async function (req, res, next) {
 router.get("/", async function (req, res, next) {
   // can do a json schema for queries (this way you will get a 400 error with bad queries)
   let query = req.query
-
+  debugger;
   // req.query can not be altered or changed!!! so we set another variable that we use to change and
   // put into jsonschema for validation
-
-  // TODO: question: are q and req.query not the same reference point? How come q can change but req.query can't
+  
+  // The req body itself can have new keys added, but not req.query!!!
 
   if(query.minEmployees) query.minEmployees = Number(query.minEmployees);
   if(query.maxEmployees) query.maxEmployees = Number(query.maxEmployees);

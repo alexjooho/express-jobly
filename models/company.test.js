@@ -137,16 +137,18 @@ describe("findAll", function () {
     ]);
   });
 
-  test("fails: with wrong filter", async function () {
+  // test("fails: with wrong filter", async function () {
 
-    const queryObj = {"color": 2, "name": '2'};
+  //   const queryObj = {"color": 2, "name": '2'};
 
-    try {
-      await Company.findAll(queryObj);
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
+  //   try {
+  //     await Company.findAll(queryObj);
+  //   } catch (err) {
+  //     expect(err instanceof BadRequestError).toBeTruthy();
+  //   }
+  // });
+  
+  // don't need this test anymore because wrong filter logic is now in json schema
 
   test("fails: with minEmployees > maxEmployees", async function () {
 

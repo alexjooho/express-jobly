@@ -142,6 +142,7 @@ class Company {
    *
    * Throws NotFoundError if not found.
    **/
+  //FIXME: FIX THIS!
 
   static async get(handle) {
     const companyRes = await db.query(
