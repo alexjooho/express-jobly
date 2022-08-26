@@ -8,27 +8,27 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 
 class Job {
     /** Create a job (from data), update db, return new job data.
-    * 
-    * data should be { title, salary, equity, company_handle}
     *
-    * Returns { title, salary, equity, company_handle}
+    * data should be { title, salary, equity, companyHandle}
+    *
+    * Returns { id, title, salary, equity, companyHandle}
     *
     * Throws BadRequestError if job already in database.
      */
-    
+
     static async create({ title, salary, equity, companyHandle }) {
       const duplicateCheck = await db.query(
           `SELECT id
               FROM jobs
               WHERE title=$1 AND company_handle=$2`,
           [title, companyHandle]);
-      
+
       console.log(duplicateCheck.rows[0])
-  
+
       if (duplicateCheck.rows[0]) {
         throw new BadRequestError(`Duplicate job posting for: ${title}`);
       }
-  
+
       const result = await db.query(
           `INSERT INTO jobs(
             title,
@@ -46,63 +46,63 @@ class Job {
           ],
       );
       const job = result.rows[0];
-  
+
       return job;
     }
-      
+
   /** Accepts an object and returns an object with keys of whereBuilder and values,
-   *  where the value of values is an array of the argument object's values, and the 
+   *  where the value of values is an array of the argument object's values, and the
    *  value of whereBuilder is a string made to be put into a WHERE clause.
    */
    static _sqlForFilteringAll(queryObj) {
     // the _ means that this is a "private" method, and will not be called outside of this class
-  
+
     let setWhere = [];
     let values = [];
     let whereBuilder;
-    
+
     const { title, minSalary, hasEquity } = queryObj;
-    
+
     if(title) {
       values.push(`%${title}%`)
       setWhere.push(`title ILIKE $${values.length}`)
     }
-    
+
     if(minSalary) {
       values.push(minSalary)
       setWhere.push(`salary>=$${values.length}`)
     }
-    
+
     if(hasEquity) {
       values.push(0)
       setWhere.push(`equity>$${values.length}`)
     }
     // TODO: ask what the best way of handling this filter is
-    
+
     if(values.length > 0) {
       whereBuilder = "WHERE " + setWhere.join(" AND ");
     }
     else {
       whereBuilder = "";
     }
-  
+
     return {
       whereBuilder,
       values
     };
-  
+
   }
-  
+
   /** Find all jobs.
    *
    * Returns [{ title, salary, equity, company_handle}, ...]
    * */
   static async findAll(queryObj) {
-    
+
     const { whereBuilder, values } = this._sqlForFilteringAll(queryObj);
-    
+
     console.log(whereBuilder)
-    
+
     const jobsRes = await db.query(
       `SELECT title,
               salary,
@@ -114,7 +114,7 @@ class Job {
         values);
   return jobsRes.rows;
   }
-  
+
   /** Given a job id, return data about job.
    *
    * Returns { id, title, salary, equity, company_handle }
@@ -139,7 +139,7 @@ class Job {
 
     return job;
   }
-  
+
   /** Update job data with `data`.
    *
    * This is a "partial update" --- it's fine if data doesn't contain all the
@@ -170,7 +170,7 @@ class Job {
 
     return job;
   }
-  
+
   /** Delete given job from database; returns undefined.
    *
    * Throws NotFoundError if job not found.

@@ -23,7 +23,7 @@ afterAll(commonAfterAll);
 /************************************** POST /companies */
 
 describe("POST /companies", function () {
-  const newCompany = {
+  const newJob = {
     handle: "new",
     name: "New",
     logoUrl: "http://new.img",
