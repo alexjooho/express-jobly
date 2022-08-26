@@ -48,7 +48,6 @@ const router = new express.Router();
  * - minSalary
  * - hasEquity
  *
- * Authorization required: admin
  */
 
  router.get("/", async function (req, res, next) {
@@ -64,7 +63,7 @@ const router = new express.Router();
     throw new BadRequestError(errs);
   }
 
-  const jobs = await Job.findAll(req.query);
+  const jobs = await Job.findAll(query);
   return res.json( { jobs });
 });
 

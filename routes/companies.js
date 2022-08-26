@@ -54,10 +54,10 @@ router.post("/", ensureAdmin,  async function (req, res, next) {
 router.get("/", async function (req, res, next) {
   // can do a json schema for queries (this way you will get a 400 error with bad queries)
   let query = req.query
-  debugger;
+  
   // req.query can not be altered or changed!!! so we set another variable that we use to change and
   // put into jsonschema for validation
-  
+
   // The req body itself can have new keys added, but not req.query!!!
 
   if(query.minEmployees) query.minEmployees = Number(query.minEmployees);
@@ -69,7 +69,7 @@ router.get("/", async function (req, res, next) {
     throw new BadRequestError(errs);
   }
 
-  const companies = await Company.findAll(req.query);
+  const companies = await Company.findAll(query);
   return res.json({ companies });
 });
 
