@@ -152,4 +152,73 @@ describe("get", function () {
             expect(err instanceof NotFoundError).toBeTruthy();
         }
     });
+    
+/************************************** update */
+
+describe("update", function () {
+    const updateData = {
+        title: 'j3',
+        salary: 70,
+        equity: 0.7,
+    };
+  
+    test("works", async function () {
+      let job = await Job.update(jobIds[0], updateData);
+      expect(job).toEqual({
+        id: jobIds[0],
+        title: 'j3',
+        salary: 70,
+        equity: "0.7",
+      });
+  
+      const result = await db.query(
+            `SELECT id, title, salary, equity
+             FROM jobs
+             WHERE title = 'j3'`);
+      expect(result.rows).toEqual([{
+        id: jobIds[0],
+        title: 'j3',
+        salary: 70,
+        equity: "0.7",
+      }]);
+    });
+  
+    test("not found if no such job", async function () {
+      try {
+        await Job.update(0, updateData);
+        throw new Error("fail test, you shouldn't get here");
+      } catch (err) {
+        expect(err instanceof NotFoundError).toBeTruthy();
+      }
+    });
+  
+    test("bad request with no data", async function () {
+      try {
+        await Job.update("j1", {});
+        throw new Error("fail test, you shouldn't get here");
+      } catch (err) {
+        expect(err instanceof BadRequestError).toBeTruthy();
+      }
+    });
+  });
+  
+  /************************************** remove */
+
+describe("remove", function () {
+    test("works", async function () {
+      await Job.remove(jobIds[0]);
+      const res = await db.query(
+          "SELECT title FROM jobs WHERE title='j1'");
+      expect(res.rows.length).toEqual(0);
+    });
+  
+    test("not found if no such job", async function () {
+      try {
+        await Job.remove(0);
+        throw new Error("fail test, you shouldn't get here");
+      } catch (err) {
+        expect(err instanceof NotFoundError).toBeTruthy();
+      }
+    });
+  });
 });

@@ -19,8 +19,9 @@ CREATE TABLE users (
 CREATE TABLE jobs (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
-  salary INTEGER CHECK (salary >= 0),
-  equity NUMERIC CHECK (equity <= 1.0),
+  salary INTEGER CHECK (salary >= 0) NOT NULL, 
+  -- not null because we never have it empty!
+  equity NUMERIC CHECK (equity <= 1.0) NOT NULL,
   company_handle VARCHAR(25) NOT NULL
     REFERENCES companies ON DELETE CASCADE
 );
